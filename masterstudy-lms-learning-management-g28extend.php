@@ -3,10 +3,14 @@
 Plugin Name: MasterStudy LMS – WordPress Course Plugin Extension
 Plugin URI: #
 Description: Integração entre plugin MasterStudy LMS e ferramenta BuilderAll
-Version: 1.0.8
+Version: 1.1.3
 Author: Guilherme Pereira
 Author URI: #
 */
+
+require 'vendor/autoload.php';
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
 
 function funACEB4C1577E98AA583197C5AE076C2F7_get_key( $key ): ?string
@@ -55,20 +59,25 @@ function funACEB4C1577E98AA583197C5AE076C2F7_lms_register_user( $user, $data ) {
                     $args[$key] = $item['value'];
                 }
             }
-
-            $response = wp_remote_post($url, [
-                'body' => $args
+            $client = new Client([
+                'base_uri'      => $url,
+                'headers'       => [
+                    'verify' => false
+                ]
             ]);
-            if(is_wp_error($response)) {
-                $logger->info($response->get_error_message(), [ 'source' => '[ LMS Extension try ]' ]);
-            } else {
-                $logger->info(implode(' ', $response), ['source' => '[ LMS Extension try ]']);
-            }
+            $response = $client->request('POST', $url, [
+                'query' => $args
+            ]);
+
+            $logger->info($response->getBody()->getContents(), [ 'source' => '[ LMS Extension try ]' ]);
+
         } 
     } catch (Exception $e) {
-            $logger->error($e->getMessage(), [ 'source' => '[ LMS Extension catch ]' ]);
+        $logger->error($e->getMessage(), [ 'source' => '[ LMS Extension catch ]' ]);
+    } catch (GuzzleException $e) {
+        $logger->error($e->getMessage(), [ 'source' => '[ LMS Extension catch ]' ]);
     }
- 
+
 }
 
 add_action( 'init', function () {
