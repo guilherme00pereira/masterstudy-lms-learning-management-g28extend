@@ -3,7 +3,7 @@
 Plugin Name: MasterStudy LMS – WordPress Course Plugin Extension
 Plugin URI: #
 Description: Integração entre plugin MasterStudy LMS e ferramenta BuilderAll
-Version: 1.0.7
+Version: 1.0.8
 Author: Guilherme Pereira
 Author URI: #
 */
@@ -72,5 +72,6 @@ function funACEB4C1577E98AA583197C5AE076C2F7_lms_register_user( $user, $data ) {
 }
 
 add_action( 'init', function () {
+    add_filter('https_ssl_verify', '__return_false');
     add_action( 'stm_lms_after_user_register', 'funACEB4C1577E98AA583197C5AE076C2F7_lms_register_user', 10, 2 );
 } );
